@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <app id="1" name="testApp" version="1.0.0" releasedate="1296480978" filename="testapp_1.0.0.rar" url="http://www.sakya.it/downloads/testapp.rar">
+    <changelog>*Initial release</changelog>
+    <message>Message to display to the user!</message>
+  </app>
+</root>

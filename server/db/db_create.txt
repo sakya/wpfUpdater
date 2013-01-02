@@ -1,0 +1,13 @@
+CREATE TABLE updater_applications (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR(100) NOT NULL,
+   filename VARCHAR(100),
+   platform VARCHAR(50) NOT NULL,
+   version VARCHAR(10) NOT NULL,
+   changelog VARCHAR(2000),
+   message VARCHAR(2000),
+   url VARCHAR(255) NOT NULL,
+   released DATETIME,
+
+   INDEX(name, platform)
+); 
