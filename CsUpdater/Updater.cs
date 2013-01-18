@@ -186,7 +186,7 @@ namespace CsUpdater
       m_Checking = true;
       UpdaterApp app = null;
       string url = string.Format("{0}?appname={1}&platform={2}", Url.ToString(),
-                                  HttpUtility.UrlEncode(AppName), HttpUtility.UrlEncode(Platform));
+                                  Uri.EscapeDataString(AppName), Uri.EscapeDataString(Platform));
       try {
         using (WebClient client = new WebClient()) {
           using (Stream data = client.OpenRead(url)) {

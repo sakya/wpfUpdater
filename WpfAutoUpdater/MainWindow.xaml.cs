@@ -33,11 +33,19 @@ namespace WpfAutoUpdater
       m_Updater.DownloadingDelegate += Download;
       m_Updater.DownloadCompletedDelegate += DownloadCompleted;
 
+      txtUrl.Text = "http://www.sakya.it/updater/updater.php";
+      txtAppName.Text = "wpfMpdClient";
+
       btnDownload.IsEnabled = false;
     }
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
+      if (string.IsNullOrEmpty(txtUrl.Text) || string.IsNullOrEmpty(txtAppName.Text)){
+        MessageBox.Show(this, "Insert a url and a application name", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        return;
+      }
+
       btnCheck.IsEnabled = false;
 
       m_Updater.Url = new Uri(txtUrl.Text);
