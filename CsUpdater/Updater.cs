@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Web;
 using System.Globalization;
+using System.Collections.Specialized;
 
 namespace CsUpdater
 {
@@ -225,5 +226,43 @@ namespace CsUpdater
       m_DownloadingFile = string.Empty;
     }
     #endregion
+  }
+
+  public class BugReporter
+  {
+    public Uri Url
+    {
+      get;
+      set;
+    }
+
+    public BugReporter(Uri url)
+    {
+      Url = url;
+    }
+
+    public void BugReport(string appName, string appVersion, string appPlatform, string text)
+    {
+      Dictionary<string, string> parameters = new Dictionary<string, string>();
+      parameters["appname"] = appName;
+      parameters["platform"] = appPlatform;
+      parameters["version"] = appVersion;
+      parameters["text"] = text;
+
+      using (WebClient client = new WebClient()) {
+        NameValueCollection data = new NameValueCollection();
+        foreach (string k in parameters.Keys)
+          data[k] = parameters[k];
+
+        try {
+          byte[] response = client.UploadValues(Url, "POST", data);
+          XmlDocument doc = new XmlDocument();
+          doc.LoadXml(System.Text.Encoding.UTF8.GetString(response));
+        }
+        catch (Exception) {
+          return;
+        }
+      }
+    } // BugReport
   }
 }

@@ -11,3 +11,12 @@ CREATE TABLE updater_applications (
 
    INDEX(name, platform)
 ); 
+
+CREATE TABLE updater_bugs (
+   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   app_id INT NOT NULL,
+   date DATETIME,
+   text TEXT,
+
+   INDEX(app_id, date)
+); 
