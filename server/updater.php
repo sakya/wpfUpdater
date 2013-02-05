@@ -8,6 +8,7 @@ include_once('xml_helper.php');
 
 $appname=$_GET["appname"];
 $platform=$_GET["platform"];
+$startVersion=$_GET["version"];
 
 $xml = "";
 xml_create($xml);
@@ -17,7 +18,7 @@ $stmt = $db->prepare("Select id, name, version, released, filename, url, changel
 					 "from updater_applications ".
 					 "where name = ? ".
 					 "  and platform = ? ".
-					 "order by released desc");
+					 "order by released desc limit 1");
 $stmt->bind_param('ss', $appname, $platform);
 $stmt->execute();
 $stmt->store_result();
@@ -25,6 +26,7 @@ $stmt->store_result();
 if ($stmt->num_rows == 0){
     //Application not found:
     xml_addElement($xml, "ERRORCODE", "ERR001");
+	$stmt->close();
 }else{
     //Application found:
 	$id = 0;
@@ -37,6 +39,42 @@ if ($stmt->num_rows == 0){
 	$message = "";
 	$stmt->bind_result($id, $name, $version, $released, $filename, $url, $changelog, $message);
 	$stmt->fetch();
+	$stmt->close();
+
+	// If a starting version is specified get the full changelog:
+	$fullchangelog = "";
+	if (strlen($startVersion)){
+		$vreleased = "";
+		$vchangelog = "";
+		$stmt = $db->prepare("Select released ".
+							 "from updater_applications ".
+							 "where name = ? ".
+							 "  and platform = ? ".
+							 "  and version = ? ");
+		$stmt->bind_param('sss', $appname, $platform, $startVersion);
+		$stmt->execute();
+		$stmt->store_result();
+		$stmt->bind_result($vreleased);
+		$stmt->fetch();
+		$stmt->close();
+		if (strlen($vreleased)){
+			$stmt = $db->prepare("Select changelog ".
+								 "from updater_applications ".
+								 "where name = ? ".
+								 "  and platform = ? ".
+								 "  and released > ? ".
+				 				 "order by released");
+			$stmt->bind_param('sss', $appname, $platform, $vreleased);
+			$stmt->execute();
+			$stmt->store_result();
+			$stmt->bind_result($vchangelog);
+			while ($stmt->fetch()) {
+				if (strlen($vchangelog))
+					$fullchangelog .= "$vchangelog\n";
+			}
+			$stmt->close();	
+		}	
+	}
 
     xml_addStartTag($xml, "app");
 
@@ -47,7 +85,7 @@ if ($stmt->num_rows == 0){
     xml_addAttribute($xml, "filename", $filename);
     xml_addAttribute($xml, "url", $url);
 
-    xml_addElement($xml, "changelog", $changelog);
+    xml_addElement($xml, "changelog", strlen($fullchangelog) ? $fullchangelog : $changelog);
     xml_addElement($xml, "message", $message);
 
     xml_addEndTag($xml, "app");
@@ -56,7 +94,6 @@ if ($stmt->num_rows == 0){
 xml_addEndTag($xml, "root");
 echo $xml;
 
-$stmt->close();
 
 //Close mysql connection
 $db->close();

@@ -145,6 +145,12 @@ namespace CsUpdater
       set;
     }
 
+    public string AppCurrentVersion
+    {
+      get;
+      set;
+    }
+
     public Updater(Uri url, string appName, string platform)
     {
       Url = url;
@@ -186,8 +192,9 @@ namespace CsUpdater
     {
       m_Checking = true;
       UpdaterApp app = null;
-      string url = string.Format("{0}?appname={1}&platform={2}", Url.ToString(),
-                                  Uri.EscapeDataString(AppName), Uri.EscapeDataString(Platform));
+      string url = string.Format("{0}?appname={1}&platform={2}&version={3}", Url.ToString(),
+                                  Uri.EscapeDataString(AppName), Uri.EscapeDataString(Platform),
+                                  string.IsNullOrEmpty(AppCurrentVersion) ? string.Empty : Uri.EscapeDataString(AppCurrentVersion));
       try {
         using (WebClient client = new WebClient()) {
           using (Stream data = client.OpenRead(url)) {

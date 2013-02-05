@@ -50,6 +50,7 @@ namespace WpfAutoUpdater
 
       m_Updater.Url = new Uri(txtUrl.Text);
       m_Updater.AppName = txtAppName.Text;
+      m_Updater.AppCurrentVersion = txtAppVersion.Text;
       m_Updater.Check();
 
       txtOutput.Clear();

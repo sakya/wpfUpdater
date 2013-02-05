@@ -14,6 +14,7 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
       <Grid.ColumnDefinitions>
@@ -27,10 +28,13 @@
 
       <Label Grid.Row="1" Content="App. name:" />
       <TextBox Grid.Row="1" Margin="2" Name="txtAppName" Grid.Column="1" />
-      <Button Grid.Row="1" Margin="2" Name="btnCheck" Content="Check" Grid.Column="2" Click="Button_Click" />
+
+      <Label Grid.Row="2" Content="App. current version:" />
+      <TextBox Grid.Row="2" Margin="2" Name="txtAppVersion" Grid.Column="1" />
+      <Button Grid.Row="2" Margin="2" Name="btnCheck" Content="Check" Grid.Column="2" Click="Button_Click" />
     </Grid>
 
-    <TextBox Margin="2" Name="txtOutput" AcceptsReturn="True" IsReadOnly="True" Grid.Row="1" />
+    <TextBox Margin="2" Name="txtOutput" AcceptsReturn="True" IsReadOnly="True" Grid.Row="1" VerticalScrollBarVisibility="Auto" />
 
     <Button Margin="2" Grid.Row="2" Name="btnDownload" Content="Download and install" Grid.Column="2" Click="btnDownload_Click" />
     <ProgressBar Margin="2" Height="20" Grid.Row="3" Name="pgbProgress" />
