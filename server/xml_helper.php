@@ -22,14 +22,19 @@ function xml_addEndTag(&$xml, $tagName){
 function xml_addAttribute(&$xml, $name, $value){
 	if (substr($xml, -1, 1) == ">")
 		$xml = rtrim($xml,">");
-	$xml = $xml." ".$name."=\"".$value."\"";
+	$xml = $xml." ".$name."=\"".xmlentities($value)."\"";
 }
 
 function xml_addElement(&$xml, $name, $value){
 	if (substr($xml, -1, 1) != ">")
 		$xml = $xml.">";
 	xml_addStartTag($xml, $name);
-	$xml = $xml.$value;
+	$xml = $xml.xmlentities($value);
 	xml_addEndTag($xml, $name);
+}
+
+function xmlentities($string) {
+    return str_replace(array("&", "<", ">", "\"", "'"),
+        array("&amp;", "&lt;", "&gt;", "&quot;", "&apos;"), $string);
 }
 ?>
