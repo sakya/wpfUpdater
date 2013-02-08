@@ -43,37 +43,27 @@ if ($stmt->num_rows == 0){
 
 	// If a starting version is specified get the full changelog:
 	$fullchangelog = "";
-	if (strlen($startVersion)){
+	if (strlen($startVersion) && $startVersion != $version){
 		$vreleased = "";
 		$vchangelog = "";
-		$stmt = $db->prepare("Select released ".
-							 "from updater_applications ".
-							 "where name = ? ".
-							 "  and platform = ? ".
-							 "  and version = ? ");
+		$stmt = $db->prepare("Select changelog ".
+							 "from updater_applications a ".
+							 "where a.name = ? ".
+							 "  and a.platform = ? ".
+							 "  and a.released > (select b.released from updater_applications b ".
+							 "					  where b.name = a.name ".
+							 "                      and b.platform = a.platform ".
+							 "                      and b.version = ?) ".
+	                         "order by released");
 		$stmt->bind_param('sss', $appname, $platform, $startVersion);
 		$stmt->execute();
 		$stmt->store_result();
-		$stmt->bind_result($vreleased);
-		$stmt->fetch();
-		$stmt->close();
-		if (strlen($vreleased)){
-			$stmt = $db->prepare("Select changelog ".
-								 "from updater_applications ".
-								 "where name = ? ".
-								 "  and platform = ? ".
-								 "  and released > ? ".
-				 				 "order by released");
-			$stmt->bind_param('sss', $appname, $platform, $vreleased);
-			$stmt->execute();
-			$stmt->store_result();
-			$stmt->bind_result($vchangelog);
-			while ($stmt->fetch()) {
-				if (strlen($vchangelog))
-					$fullchangelog .= "$vchangelog\n";
-			}
-			$stmt->close();	
-		}	
+		$stmt->bind_result($vchangelog);
+		while ($stmt->fetch()) {
+			if (strlen($vchangelog))
+				$fullchangelog .= "$vchangelog\n";
+		}
+		$stmt->close();	
 	}
 
     xml_addStartTag($xml, "app");
