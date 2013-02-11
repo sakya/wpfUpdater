@@ -118,11 +118,12 @@ namespace CsUpdater
     public delegate void CheckCompleted(UpdaterApp app);
     public delegate void Downloading(string filename, double percentage);
     public delegate void DownloadCompleted(string filename);
+    public delegate void DownloadFailed(string filename, Exception exception);
 
     public CheckCompleted CheckCompletedDelegate;
     public Downloading DownloadingDelegate;
     public DownloadCompleted DownloadCompletedDelegate;
-    public DownloadCompleted DownloadFailedDelegate;
+    public DownloadFailed DownloadFailedDelegate;
     #endregion
 
     bool m_Checking = false;
@@ -177,9 +178,9 @@ namespace CsUpdater
       if (!Directory.Exists(path)){
         try{
           Directory.CreateDirectory(path);
-        }catch (Exception){
+        }catch (Exception ex){
           if (DownloadFailedDelegate != null)
-            DownloadFailedDelegate(m_DownloadingFile);
+            DownloadFailedDelegate(m_DownloadingFile, ex);
           return;
         }
       }
@@ -244,7 +245,7 @@ namespace CsUpdater
       if (!error && DownloadCompletedDelegate != null)
         DownloadCompletedDelegate(m_DownloadingFile);
       else if (error && DownloadFailedDelegate != null)
-        DownloadFailedDelegate(m_DownloadingFile);
+        DownloadFailedDelegate(m_DownloadingFile, e.Error);
       m_DownloadingFile = string.Empty;
     }
     #endregion
