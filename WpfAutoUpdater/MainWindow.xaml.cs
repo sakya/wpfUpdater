@@ -85,7 +85,7 @@ namespace WpfAutoUpdater
     {
       if (m_App != null) {
         btnDownload.IsEnabled = false;
-        m_Updater.Download(m_App.Url, string.Format("{0}\\temp\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), m_App.FileName));
+        m_Updater.Download(m_App.Url, string.Format("{0}\\{1}", System.IO.Path.GetTempPath(), m_App.FileName));
       }
     }
 

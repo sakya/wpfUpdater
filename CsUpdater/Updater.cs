@@ -122,6 +122,7 @@ namespace CsUpdater
     public CheckCompleted CheckCompletedDelegate;
     public Downloading DownloadingDelegate;
     public DownloadCompleted DownloadCompletedDelegate;
+    public DownloadCompleted DownloadFailedDelegate;
     #endregion
 
     bool m_Checking = false;
@@ -171,6 +172,17 @@ namespace CsUpdater
     {
       if (!string.IsNullOrEmpty(m_DownloadingFile))
         return;
+
+      string path = Path.GetDirectoryName(filename);
+      if (!Directory.Exists(path)){
+        try{
+          Directory.CreateDirectory(path);
+        }catch (Exception){
+          if (DownloadFailedDelegate != null)
+            DownloadFailedDelegate(m_DownloadingFile);
+          return;
+        }
+      }
 
       m_DownloadingFile = filename;
       WebClient webClient = new WebClient();
@@ -228,8 +240,11 @@ namespace CsUpdater
 
     private void DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
     {
-      if (DownloadCompletedDelegate != null)
+      bool error = e.Error != null;
+      if (!error && DownloadCompletedDelegate != null)
         DownloadCompletedDelegate(m_DownloadingFile);
+      else if (error && DownloadFailedDelegate != null)
+        DownloadFailedDelegate(m_DownloadingFile);
       m_DownloadingFile = string.Empty;
     }
     #endregion
@@ -248,12 +263,13 @@ namespace CsUpdater
       Url = url;
     }
 
-    public void BugReport(string appName, string appVersion, string appPlatform, string text)
+    public void BugReport(string appName, string appVersion, string appPlatform, string email, string text)
     {
       Dictionary<string, string> parameters = new Dictionary<string, string>();
       parameters["appname"] = appName;
       parameters["platform"] = appPlatform;
       parameters["version"] = appVersion;
+      parameters["email"] = email;
       parameters["text"] = text;
 
       using (WebClient client = new WebClient()) {

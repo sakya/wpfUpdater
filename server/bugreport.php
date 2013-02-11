@@ -8,13 +8,14 @@ $limit = 30;
 
 $sendmail = false;
 $to = "...";
-$from = "bugreport@yourdomain.com";
+$from = "...";
 
 //////////////////////////End Main Configuration ///////////////////////////
 
 $appname=$_POST["appname"];
 $platform=$_POST["platform"];
 $version=$_POST["version"];
+$email=$_POST["email"];
 $text=$_POST["text"];
 
 $xml = "";
@@ -41,9 +42,9 @@ if ($stmt->num_rows == 0){
 	$stmt->fetch();
 	$stmt->close();
 
-	$stmt = $db->prepare("insert into updater_bugs(app_id, date, text) ".
-						 "values(?, NOW(), ?)");
-	$stmt->bind_param('is', $id, $text);
+	$stmt = $db->prepare("insert into updater_bugs(app_id, date, email, text) ".
+						 "values(?, NOW(), ?, ?)");
+	$stmt->bind_param('iss', $id, $email, $text);
 	$stmt->execute();
 	$stmt->close();
 
@@ -67,6 +68,8 @@ if ($stmt->num_rows == 0){
 	}
 
 	if ($sendmail){
+		if (strlen($email)) 
+			$from = $email;
 		$subject = "BUG-REPORT: ".$appname." v.".$version;
 		$headers = "From: ".$from;
 		$body = "App name: ".$appname."\n".
