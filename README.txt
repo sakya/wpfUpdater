@@ -17,6 +17,9 @@ Client usage:
 -Create an instance of Updater:
   m_Updater = new Updater(new Uri("url_to_updater.php"), "ProgramName", "ProgramPlatform");
 
+-If you want an incremental changelog (including all changelogs from the current version to the newest one) set the current version number:
+  m_Updater.AppCurrentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
 -Set the delegate:
   m_Updater.CheckCompletedDelegate += CheckCompleted;
 
